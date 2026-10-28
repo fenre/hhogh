@@ -33,7 +33,16 @@ def nodate(iso):
     return f'{d.day}. {MONTHS[d.month - 1]} {d.year}'
 
 
-def page(title, desc, path, body, image=None):
+def page(title, desc, path, body, image=None, rel=None):
+    """rel: prefiks for interne lenker ('' på rot, '../' i en post), så siden virker både på
+    hhogh.no og på fenre.github.io/hhogh/. None = absolutte stier (404-siden)."""
+    out = _page(title, desc, path, body, image)
+    if rel is not None:
+        out = out.replace('href="/', f'href="{rel}').replace('src="/', f'src="{rel}')
+    return out
+
+
+def _page(title, desc, path, body, image=None):
     t = html.escape(f'{title} — {TITLE}' if title != TITLE else TITLE)
     og = f'\n  <meta property="og:image" content="{SITE}{image}">' if image else ''
     return f'''<!DOCTYPE html>
@@ -166,7 +175,7 @@ for i, (p, slug, title, body, image, used) in enumerate(built):
 {body}
   </div>
 {comments}{pager}</article>'''
-    open(f'{root}/{slug}/index.html', 'w').write(page(title, excerpt(body, 155), f'/{slug}/', art, image))
+    open(f'{root}/{slug}/index.html', 'w').write(page(title, excerpt(body, 155), f'/{slug}/', art, image, rel='../'))
     thumb = f'''    <a class="post-card__thumb-link" href="/{slug}/" tabindex="-1" aria-hidden="true">
       <img class="post-card__thumb" src="{image}" alt="" width="320" height="200" loading="lazy" decoding="async">
     </a>
@@ -181,7 +190,7 @@ for i, (p, slug, title, body, image, used) in enumerate(built):
 ''')
 
 # Gamle WordPress-lenker (hhogh.no/?p=13) sendes videre til riktig brygg
-redirect = 'var m = location.search.match(/[?&]p=(\\d+)/), map = ' + json.dumps({str(k): f'/{v}/' for k, v in SLUG.items()}) + ';\n  if (m && map[m[1]]) location.replace(map[m[1]]);'
+redirect = 'var m = location.search.match(/[?&]p=(\\d+)/), map = ' + json.dumps({str(k): f'{v}/' for k, v in SLUG.items()}) + ';\n  if (m && map[m[1]]) location.replace(map[m[1]]);'
 index = f'''<script>
   {redirect}
 </script>
@@ -189,7 +198,7 @@ index = f'''<script>
   <h1 class="blogger-feed__heading">{TITLE}</h1>
   <p class="hhogh-intro">Fra 2014 til 2016 brygget Fredrik, Steffen, Leif, Gaute og Jonas øl sammen, og skrev en kort post om hvert brygg. Her er alle de 13 postene, hentet tilbake fra Internet Archive.</p>
 {''.join(reversed(cards))}</section>'''
-open(f'{root}/index.html', 'w').write(page(TITLE, 'Bryggeloggen til Hafrsfjord Hornmusik og Haandbryggerlaug, 13 brygg fra 2014 til 2016.', '/', index))
+open(f'{root}/index.html', 'w').write(page(TITLE, 'Bryggeloggen til Hafrsfjord Hornmusik og Haandbryggerlaug, 13 brygg fra 2014 til 2016.', '/', index, rel=''))
 open(f'{root}/404.html', 'w').write(page('Fant ikke siden', 'Siden finnes ikke.', '/404.html',
     '<section class="blogger-feed"><h1 class="blogger-feed__heading">Fant ikke siden</h1><p><a href="/">Til alle brygg</a></p></section>'))
 urls = ['/'] + [f'/{b[1]}/' for b in built]
