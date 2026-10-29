@@ -6,4 +6,4 @@ Bryggeloggen fra hhogh.no, 13 brygg fra 2014 til 2016. Det opprinnelige WordPres
 - `scripts/download.py` laster ned bilder og vedlegg fra Wayback Machine. Der originalen ikke er arkivert, brukes den største arkiverte versjonen.
 - `scripts/build.py` bygger HTML-sidene med samme oppsett som originalen. `theme/` er WordPress-temaet Contango (DesignOrbital, GPLv3) slik det lå på hhogh.no, pluss `hhogh.css` for mobil. Gamle lenker på formen `/?p=13` sendes videre til riktig brygg.
 
-Ikke reddet (finnes ikke i arkivet): ett bilde i Batch #1, videoene i Batch #5 og #8, og ett bilde i Batch #10.
+Ikke reddet (finnes ikke i arkivet): ett bilde i Batch #1, videoen i Batch #5, og ett bilde i Batch #10.
